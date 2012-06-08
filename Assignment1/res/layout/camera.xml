@@ -55,6 +55,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/horizontalScrollView1"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentLeft="true"
+            android:max="100"
+            android:progress="10" />
 
     </RelativeLayout>

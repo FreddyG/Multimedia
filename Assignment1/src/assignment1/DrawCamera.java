@@ -18,6 +18,8 @@ public class DrawCamera {
 	public int[] rgb;			// the array of integers
 	public Size imageSize;
 	public Paint p;
+	// added
+	public int[] histogram, histogram2;
 	
 	
 	public void imageReceived(byte[] data) {
@@ -32,6 +34,34 @@ public class DrawCamera {
 		// the histogram should be class member so you can access 
 		// it in other methods of this class.
 		// ....
+		
+		// added
+		histogram = new int[256];
+		histogram2 = new int[4];
+		
+		for(int i = 0; i < histogram.length; i++) {
+			histogram[i] = 0;
+		}
+		for(int i = 0; i < histogram2.length; i++) {
+			histogram2[i] = 0;
+		}
+		
+		for(int i = 0; i < rgb.length; i++) {
+			int green = g(rgb[i]);
+			histogram[green] += 1; 
+		}
+		
+		double bw = 256/(histogram2.length * 1.0);
+		double index;
+		
+		for(int i = 0; i < histogram2.length; i++) {
+			for(int j = 0; j < histogram.length; j++) {
+				index = histogram[j]/(bw * 1.0);
+				if(index >= i && index < i+1) {
+					histogram2[i] += histogram[j];
+				}
+			}
+		}
 	}
 	
 	private void axisDraw(Canvas c, float len) {
@@ -64,10 +94,31 @@ public class DrawCamera {
 		axisDraw(c,100f);
 		c.drawColor(Color.GRAY);
 		p.setColor(combine(255, 0, 0));
-		c.drawText("canvas width = "+c.getWidth(), 15, 45, p);
-		c.drawText("canvas heightt = "+c.getHeight(), 15, 60, p);
+		//added
+		c.translate(0,135);
+		c.scale(1,-1);
 		
-		c.drawLine(0.0f,0.0f,(float)c.getWidth()-5, c.getHeight(),p);
+		int bin = 4, start = 10, start2 = 20;
+		float size = 300/(bin * 1.0f);
+		
+		for(int i = 0; i < bin; i++) {
+			c.drawRect(start,0,size,histogram2[i],p);
+			start += size;
+			start2 += size;
+		}
+		
+		//c.drawRect(10,0,20,10,p);
+		//c.drawRect(20,0,30,100,p);
+		//c.drawRect(30,0,310,50,p);
+		
+		//c.drawText("a = "+histogram2[0], 15, 45, p);
+		//c.drawText("a = "+histogram2[1], 15, 60, p);
+		//c.drawText("a = "+histogram2[2], 15, 75, p);
+		//c.drawText("a = "+histogram2[3], 15, 90, p);
+		//c.drawText("canvas width = "+c.getWidth(), 15, 45, p);
+		//c.drawText("canvas heightt = "+c.getHeight(), 15, 60, p);
+		
+		//c.drawLine(0.0f,0.0f,(float)c.getWidth()-5, c.getHeight(),p);
 	
 		Log.d("DEBUG", "canvas w = " + c.getWidth() + " h = " + c.getHeight()); // this writes to the LogCat that can be read on your PC in
 																				// the phone is connected
